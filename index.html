@@ -67,10 +67,10 @@
           <input type="text" id="heroInput" placeholder="Paste your product — e.g. Battery Management Systems" autocomplete="off" />
           <button class="btn btn--solid" type="submit">Run it ▸</button>
         </form>
-        <p class="hero__fineprint mono reveal reveal--d4">Instant in-browser demo.</p>
+        <p class="hero__fineprint mono reveal reveal--d4">Live engine — every result below comes from the database.</p>
 
         <!-- live pipeline terminal -->
-        <div class="terminal reveal reveal--d5" role="img" aria-label="BOOKD pipeline simulation">
+        <div class="terminal reveal reveal--d5" role="img" aria-label="BOOKD booked meetings feed">
           <div class="terminal__bar">
             <span class="terminal__dot"></span><span class="terminal__dot"></span><span class="terminal__dot"></span>
             <span class="terminal__title mono">bookd — pipeline://live</span>
@@ -141,7 +141,7 @@
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2m0 14v2M3 12h2m14 0h2"/></svg>
           </div>
           <h3>Global contact pool</h3>
-          <p>Scans 500M+ company records in the vault — filtered by industry, title, region, and live buying signals.</p>
+          <p>Scans your connected sources — imported lists, Apollo, Hunter — filtered by industry, title, region, and buying signals.</p>
           <span class="stage__tag mono">SEARCH</span>
         </li>
         <li class="stage reveal">
@@ -177,7 +177,7 @@
     <!-- ══════════ LIVE DEMO ══════════ -->
     <section class="demo" id="demo">
       <div class="section-head">
-        <p class="kicker mono">LIVE DEMO — 40 seconds to a verdict</p>
+        <p class="kicker mono">LIVE RUN — against the real engine</p>
         <h2 class="section-title">Throw a product in. Right now.</h2>
       </div>
       <div class="demo__panel reveal">
@@ -186,41 +186,23 @@
           <button class="btn btn--solid" type="submit">Start hunting ▸</button>
         </form>
         <ol class="demo__steps mono" id="demoSteps">
-          <li data-step="scan"><i>02</i> Scanning the global pool…</li>
-          <li data-step="match"><i>03</i> Writing personalized emails…</li>
-          <li data-step="send"><i>04</i> Sequence engaged — sending…</li>
-          <li data-step="book"><i>05</i> Buyer replied — time locked…</li>
+          <li><i>--</i> Engine idle — enter a product above to start a real run.</li>
         </ol>
         <div class="demo__results" id="demoResults" hidden>
-          <p class="demo__count mono">✔ 3 meetings booked</p>
-          <div class="demo__cards">
-            <article class="meet-card">
-              <h4>Sourcing Director</h4><p class="mono">DECISION-READY</p>
-              <p class="meet-card__org">Precision parts manufacturer · Munich</p>
-              <p class="meet-card__time mono">Thu 15:00 CET</p>
-            </article>
-            <article class="meet-card">
-              <h4>VP, Procurement</h4><p class="mono">BUDGET ACTIVE</p>
-              <p class="meet-card__org">Mobility group · Detroit</p>
-              <p class="meet-card__time mono">Tue 10:30 EST</p>
-            </article>
-            <article class="meet-card">
-              <h4>Procurement Lead</h4><p class="mono">PILOT SCOPE SET</p>
-              <p class="meet-card__org">Industrial group · Nagoya</p>
-              <p class="meet-card__time mono">Fri 09:00 JST</p>
-            </article>
-          </div>
+          <p class="demo__count mono"></p>
+          <div class="demo__cards"></div>
         </div>
+        <p class="mono demo__disclaimer">Runs in draft mode from this page — no email leaves the outbox until you connect SMTP and set <code>send=true</code> via the API.</p>
       </div>
     </section>
 
-    <!-- ══════════ STATS ══════════ -->
+    <!-- ══════════ STATS (live from the engine DB) ══════════ -->
     <section class="stats">
       <div class="stats__grid">
-        <div class="stat reveal"><b class="mono" data-count="500" data-suffix="M+">0</b><span>Contacts in the vault</span></div>
-        <div class="stat reveal"><b class="mono" data-count="187" data-suffix="">0</b><span>Countries covered</span></div>
-        <div class="stat reveal"><b class="mono" data-count="42" data-suffix="">0</b><span>Languages in the writer</span></div>
-        <div class="stat reveal"><b class="mono" data-count="38" data-suffix=" days">0</b><span>Median to first meeting</span></div>
+        <div class="stat reveal"><b class="mono" id="statLeads">–</b><span>Leads in the vault</span></div>
+        <div class="stat reveal"><b class="mono" id="statEmails">–</b><span>Emails sent / queued</span></div>
+        <div class="stat reveal"><b class="mono" id="statMeetings">–</b><span>Meetings booked</span></div>
+        <div class="stat reveal"><b class="mono" id="statRuns">–</b><span>Runs executed</span></div>
       </div>
     </section>
 

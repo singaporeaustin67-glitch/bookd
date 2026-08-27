@@ -1,80 +1,69 @@
-/* BOOKD — interactions: terminal sim, ticker, reveals, demo pipeline, counters */
+/* BOOKD — frontend wired to the real engine API.
+   The demo widget creates actual runs in the backend and renders what the
+   database returns. Nothing on this page is scripted anymore. */
 
 (() => {
   "use strict";
 
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ── hero terminal simulation ─────────────────────────── */
+  /* ── status bar: honest capability report from the engine ── */
+  const statusText = document.querySelector(".statusbar-text");
+  fetch("/api/config")
+    .then((r) => r.json())
+    .then((caps) => {
+      const providers = Object.entries(caps.lead_providers)
+        .filter(([, on]) => on)
+        .map(([name]) => name)
+        .join(" + ");
+      statusText.textContent =
+        `ENGINE ONLINE — composer: ${caps.composer} · sender: ${caps.sender} · sources: ${providers}`;
+    })
+    .catch(() => {
+      statusText.textContent = "ENGINE OFFLINE — API unreachable";
+    });
+
+  /* ── hero terminal: shows real booked meetings, or the honest empty state ── */
   const log = document.getElementById("terminalLog");
   const result = document.getElementById("terminalResult");
-
-  const CYCLES = [
-    {
-      lines: [
-        'Product loaded → "industrial CNC cutting fluid"',
-        "Scanning 187-country pool … 12,483 buyers matched",
-        "AI drafts personalized emails … 3 locales pass quality gate",
-        "Sequence live ▸ 2,000/day · auto follow-up",
-        "Sourcing Director (Munich) accepted — Thu 15:00 CET",
-      ],
-      ok: "✔ Delivered — meeting on your calendar",
-    },
-    {
-      lines: [
-        'Product loaded → "athletic socks, OEM program"',
-        "Scanning global buying signals … 4,209 buyers matched",
-        "AI drafts personalized emails … 5 locales pass quality gate",
-        "Sequence live ▸ 900/day · auto follow-up",
-        "VP Procurement (Detroit) accepted — Tue 10:30 EST",
-      ],
-      ok: "✔ Delivered — meeting on your calendar",
-    },
-  ];
-
-  let cycleIdx = 0;
-  function runTerminal() {
-    const cycle = CYCLES[cycleIdx % CYCLES.length];
-    cycleIdx += 1;
-    log.innerHTML = "";
-    result.hidden = true;
-    cycle.lines.forEach((line, i) => {
-      setTimeout(() => {
-        const li = document.createElement("li");
-        if (i === cycle.lines.length - 1) li.classList.add("ok");
-        li.textContent = line;
-        log.appendChild(li);
-        if (i === cycle.lines.length - 1) {
-          setTimeout(() => {
-            result.textContent = cycle.ok;
-            result.hidden = false;
-          }, 450);
-        }
-      }, i * (reduceMotion ? 10 : 640));
+  fetch("/api/meetings")
+    .then((r) => r.json())
+    .then((meetings) => {
+      if (!meetings.length) {
+        log.innerHTML = "<li>No meetings booked yet — run the engine below.</li>";
+        return;
+      }
+      meetings.slice(0, 5).forEach((m, i) => {
+        setTimeout(() => {
+          const li = document.createElement("li");
+          li.classList.add("ok");
+          li.textContent = `${m.company || m.lead_email} — ${m.start_iso} UTC`;
+          log.appendChild(li);
+        }, i * (reduceMotion ? 10 : 400));
+      });
+      result.textContent = `✔ ${meetings.length} meeting${meetings.length > 1 ? "s" : ""} on the calendar`;
+      result.hidden = false;
+    })
+    .catch(() => {
+      log.innerHTML = "<li>Engine offline.</li>";
     });
-    const wait = cycle.lines.length * (reduceMotion ? 10 : 640) + 3200;
-    setTimeout(runTerminal, wait);
-  }
-  if (log) runTerminal();
 
-  /* ── ticker feed ──────────────────────────────────────── */
+  /* ── ticker ─────────────────────────────────────────────── */
   const lines = [
     "✔ RESULT, NOT DATA",
-    "✔ YOU PAY FOR MEETED MEETINGS",
+    "✔ YOU PAY FOR MET MEETINGS",
     "✔ NO-SHOW = NO CHARGE",
-    "✔ 500M+ CONTACTS — ZERO LEAVE THE VAULT",
-    "✔ 40+ LANGUAGES IN THE WRITER",
+    "✔ THE LIST NEVER LEAVES THE VAULT",
     "✔ QUALITY GATE BEFORE EVERY SEND",
     "✔ MEETINGS. THAT'S THE DELIVERABLE.",
   ];
   const track = document.getElementById("tickerTrack");
   if (track) {
     const items = lines.map((t) => `<span>${t}</span>`).join("");
-    track.innerHTML = items + items; // duplicate for seamless loop
+    track.innerHTML = items + items;
   }
 
-  /* ── scroll reveals ───────────────────────────────────── */
-  const reveals = document.querySelectorAll(".reveal");
+  /* ── scroll reveals ─────────────────────────────────────── */
   const io = new IntersectionObserver(
     (entries) => {
       entries.forEach((e) => {
@@ -86,38 +75,21 @@
     },
     { threshold: 0.12 }
   );
-  reveals.forEach((el) => io.observe(el));
+  document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
 
-  /* ── count-up stats ───────────────────────────────────── */
-  const counters = document.querySelectorAll("[data-count]");
-  const counterIO = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        const el = entry.target;
-        const target = Number(el.dataset.count);
-        const suffix = el.dataset.suffix || "";
-        counterIO.unobserve(el);
-        if (reduceMotion) {
-          el.textContent = `${target}${suffix}`;
-          return;
-        }
-        const start = performance.now();
-        const dur = 1400;
-        function tick(now) {
-          const p = Math.min((now - start) / dur, 1);
-          const eased = 1 - Math.pow(1 - p, 3);
-          el.textContent = `${Math.round(target * eased)}${suffix}`;
-          if (p < 1) requestAnimationFrame(tick);
-        }
-        requestAnimationFrame(tick);
-      });
-    },
-    { threshold: 0.6 }
-  );
-  counters.forEach((c) => counterIO.observe(c));
+  /* ── live stats from the engine DB ────────────────────── */
+  fetch("/api/stats")
+    .then((r) => r.json())
+    .then((s) => {
+      const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+      set("statLeads", s.leads);
+      set("statEmails", s.emails_sent);
+      set("statMeetings", s.meetings);
+      set("statRuns", s.runs);
+    })
+    .catch(() => {});
 
-  /* ── hero form → demo section ─────────────────────────── */
+  /* ── hero form → demo section ───────────────────────────── */
   const heroForm = document.getElementById("heroForm");
   const heroInput = document.getElementById("heroInput");
   const demoInput = document.getElementById("demoInput");
@@ -127,31 +99,90 @@
     document.getElementById("demo").scrollIntoView({ behavior: "smooth" });
   });
 
-  /* ── demo pipeline widget ─────────────────────────────── */
+  /* ── demo widget: real runs against the engine ──────────── */
   const demoForm = document.getElementById("demoForm");
   const stepsBox = document.getElementById("demoSteps");
   const resultsBox = document.getElementById("demoResults");
-  const STEP_TIME = reduceMotion ? 30 : 900;
+  const countEl = resultsBox.querySelector(".demo__count");
+  const cardsEl = resultsBox.querySelector(".demo__cards");
 
-  demoForm?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const steps = stepsBox.querySelectorAll("li");
-    resultsBox.hidden = true;
-    steps.forEach((s) => s.classList.remove("done", "active"));
+  const STAGE_ORDER = ["input", "search", "write", "send", "booked"];
 
-    steps.forEach((step, i) => {
-      setTimeout(() => {
-        steps.forEach((s, j) => {
-          if (j < i) s.classList.replace("active", "done");
-        });
-        step.classList.add("active");
-        if (i === steps.length - 1) {
-          setTimeout(() => {
-            step.classList.replace("active", "done");
-            resultsBox.hidden = false;
-          }, STEP_TIME);
-        }
-      }, i * STEP_TIME);
+  function renderEvents(events) {
+    stepsBox.innerHTML = "";
+    events.forEach((ev) => {
+      const li = document.createElement("li");
+      li.classList.add("done");
+      const idx = STAGE_ORDER.indexOf(ev.stage);
+      li.innerHTML = `<i>${String(idx + 1).padStart(2, "0")}</i> ${ev.message}`;
+      stepsBox.appendChild(li);
     });
+  }
+
+  function renderMeetings(meetings) {
+    cardsEl.innerHTML = "";
+    meetings.forEach((m) => {
+      const card = document.createElement("article");
+      card.className = "meet-card";
+      const name = [m.first_name, m.last_name].filter(Boolean).join(" ") || m.lead_title || "Buyer";
+      card.innerHTML = `
+        <h4>${name}</h4><p class="mono">${(m.lead_title || "").toUpperCase()}</p>
+        <p class="meet-card__org">${m.company || ""}${m.country ? " · " + m.country : ""}</p>
+        <p class="meet-card__time mono">${m.start_iso} UTC</p>
+        <a class="meet-card__ics mono" href="/api/meetings/${m.id}/ics" download>↓ add to calendar (.ics)</a>`;
+      cardsEl.appendChild(card);
+    });
+  }
+
+  async function pollRun(runId) {
+    const resp = await fetch(`/api/runs/${runId}`);
+    const run = await resp.json();
+    renderEvents(run.events);
+
+    if (["completed", "failed", "no_leads"].includes(run.status)) {
+      resultsBox.hidden = false;
+      if (run.status === "no_leads") {
+        countEl.innerHTML =
+          "✕ No leads in any configured source. Import your own list: " +
+          "<code>POST /api/leads/import</code> (CSV) or set <code>APOLLO_API_KEY</code>.";
+        cardsEl.innerHTML = "";
+      } else if (run.status === "failed") {
+        countEl.textContent = "✕ Run failed — see the event log above.";
+        cardsEl.innerHTML = "";
+      } else if (run.meetings.length) {
+        countEl.innerHTML = `✔ <b>${run.meetings.length}</b> meeting${run.meetings.length > 1 ? "s" : ""} booked`;
+        renderMeetings(run.meetings);
+      } else {
+        const sentPart = run.emails_sent
+          ? ` ${run.emails_sent} emails queued/sent.`
+          : " Drafts prepared (send=false).";
+        countEl.innerHTML =
+          `✔ Run complete — ${run.leads_found} buyers matched.${sentPart} ` +
+          "Meetings appear here when buyers reply.";
+        cardsEl.innerHTML = "";
+      }
+      return;
+    }
+    setTimeout(() => pollRun(runId), 700);
+  }
+
+  demoForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const product = demoInput.value.trim();
+    if (!product) return;
+    resultsBox.hidden = true;
+    stepsBox.innerHTML = "<li class='active'><i>01</i> Starting run…</li>";
+    try {
+      const resp = await fetch("/api/runs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product, send: false }),
+      });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const { run_id } = await resp.json();
+      pollRun(run_id);
+    } catch (err) {
+      stepsBox.innerHTML = `<li class='active'><i>!!</i> Engine unreachable — ${err.message}</li>`;
+    }
   });
 })();
