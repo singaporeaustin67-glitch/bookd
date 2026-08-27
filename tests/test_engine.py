@@ -17,7 +17,7 @@ os.environ["BOOKD_DB"] = "/tmp/bookd_test.db"
 if os.path.exists("/tmp/bookd_test.db"):
     os.remove("/tmp/bookd_test.db")
 
-from server import booker, classify, db, icp  # noqa: E402
+from server import booker, classify, db, icp, keys, quota  # noqa: E402
 from server.app import app  # noqa: E402
 
 db.init_db()
@@ -139,7 +139,69 @@ def _wait_for_run(run_id: str, timeout: float = 15) -> dict:
     deadline = time.time() + timeout
     while time.time() < deadline:
         run = client.get(f"/api/runs/{run_id}").json()
-        if run["status"] in ("completed", "failed", "no_leads"):
+        if run["status"] in ("completed", "failed", "no_leads", "quota_exceeded"):
             return run
         time.sleep(0.2)
     pytest.fail(f"run {run_id} did not finish in {timeout}s")
+
+
+def test_workspace_defaults_to_free_tier():
+    data = client.get("/api/workspace").json()
+    assert data["quota"]["tier"] == "free"
+    assert data["quota"]["limit"] == 50
+    assert data["plans"]["professional"]["hunt_limit"] == 3000
+
+
+def test_byok_key_lifecycle():
+    resp = client.post(
+        "/api/workspace/keys",
+        json={"provider": "apollo", "api_key": "test-apollo-secret-1234"},
+    )
+    assert resp.status_code == 201
+    assert resp.json()["preview"] == "····1234"
+
+    ws = client.get("/api/workspace").json()
+    assert ws["keys"][0]["provider"] == "apollo"
+    assert "test" not in ws["keys"][0]["preview"]
+
+    key, source = keys.resolve("apollo")
+    assert key == "test-apollo-secret-1234"
+    assert source == "byok"
+
+    assert client.delete("/api/workspace/keys/apollo").json() == {"deleted": "apollo"}
+    key, source = keys.resolve("apollo")
+    assert key is None and source in ("env", "none")
+
+
+def test_quota_caps_then_blocks_runs():
+    # burn the free allowance down to one hunt left
+    with db.connect() as conn:
+        conn.execute(
+            "DELETE FROM usage_counters WHERE workspace=? AND month=?",
+            ("local", quota.month_key()),
+        )
+        conn.commit()
+        quota.consume(conn, 49)
+    resp = client.post("/api/runs", json={"product": "quota cap test", "send": False})
+    assert resp.status_code == 201
+    run = _wait_for_run(resp.json()["run_id"])
+    assert run["status"] == "completed"
+    assert run["leads_found"] == 1  # request capped by what this month has left
+    assert any("capped" in e["message"] for e in run["events"])
+    with db.connect() as conn:
+        assert quota.usage(conn) == 50
+
+    # quota spent → 402, run never created
+    resp = client.post("/api/runs", json={"product": "blocked", "send": False})
+    assert resp.status_code == 402
+    assert resp.json()["detail"]["error"] == "quota_exceeded"
+
+    # upgrading flips it open again
+    assert client.put("/api/workspace/tier", json={"tier": "professional"}).status_code == 200
+    resp = client.post("/api/runs", json={"product": "post-upgrade", "send": False})
+    assert resp.status_code == 201
+    run = _wait_for_run(resp.json()["run_id"])
+    assert run["status"] == "completed"
+    assert run["leads_found"] == 3
+    # restore defaults for future tests
+    assert client.put("/api/workspace/tier", json={"tier": "free"}).status_code == 200

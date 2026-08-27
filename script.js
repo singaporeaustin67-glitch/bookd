@@ -51,8 +51,8 @@
   /* ── ticker ─────────────────────────────────────────────── */
   const lines = [
     "✔ RESULT, NOT DATA",
-    "✔ YOU PAY FOR MET MEETINGS",
-    "✔ NO-SHOW = NO CHARGE",
+    "✔ FLAT MONTHLY SUBSCRIPTION",
+    "✔ 50 FREE HUNTS EVERY MONTH",
     "✔ THE LIST NEVER LEAVES THE VAULT",
     "✔ QUALITY GATE BEFORE EVERY SEND",
     "✔ MEETINGS. THAT'S THE DELIVERABLE.",
@@ -166,9 +166,14 @@
     const run = await resp.json();
     renderEvents(run.events);
 
-    if (["completed", "failed", "no_leads"].includes(run.status)) {
+    if (["completed", "failed", "no_leads", "quota_exceeded"].includes(run.status)) {
       resultsBox.hidden = false;
-      if (run.status === "no_leads") {
+      if (run.status === "quota_exceeded") {
+        countEl.innerHTML =
+          "✕ Monthly hunt quota reached on the Free plan. " +
+          "<a href='#pricing'>Upgrade — 3,000 hunts for $79/mo</a>, or wait for the 1st.";
+        cardsEl.innerHTML = "";
+      } else if (run.status === "no_leads") {
         countEl.innerHTML =
           "✕ No leads in any configured source. Import your own list: " +
           "<code>POST /api/leads/import</code> (CSV) or set <code>APOLLO_API_KEY</code>.";
@@ -205,6 +210,13 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ product, send: false }),
       });
+      if (resp.status === 402) {
+        const detail = (await resp.json()).detail || {};
+        stepsBox.innerHTML =
+          `<li class='active'><i>!!</i> ${detail.message || "Monthly hunt quota reached."} ` +
+          `<a href='#pricing'>See plans ▸</a></li>`;
+        return;
+      }
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const { run_id } = await resp.json();
       pollRun(run_id);

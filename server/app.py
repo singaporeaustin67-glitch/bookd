@@ -12,8 +12,8 @@ from fastapi import BackgroundTasks, FastAPI, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import config, db, pipeline
-from .models import ContactIn, LeadIn, ReplyIn, RunRequest
+from . import config, db, keys, pipeline, quota, tiers
+from .models import ContactIn, KeyIn, LeadIn, ReplyIn, RunRequest, TierUpdate
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -29,11 +29,72 @@ app = FastAPI(title="BOOKD Engine", version="0.1.0", lifespan=lifespan)
 
 @app.get("/api/config")
 def get_config() -> dict:
-    return config.capabilities()
+    caps = config.capabilities()
+    caps["lead_providers"] = {
+        "csv_import": True,
+        "apollo": keys.resolve("apollo")[1],
+        "hunter": keys.resolve("hunter")[1],
+    }
+    return caps
+
+
+@app.get("/api/workspace")
+def get_workspace() -> dict:
+    """Current tier, this month's quota, and BYOK key inventory."""
+    with db.connect() as conn:
+        state = quota.status(conn)
+    return {
+        "quota": state,
+        "keys": keys.list_keys(tiers.DEFAULT_WORKSPACE),
+        "plans": {name: tiers.tier_info(name) for name in tiers.TIERS},
+    }
+
+
+@app.put("/api/workspace/tier")
+def set_workspace_tier(req: TierUpdate) -> dict:
+    """Demo admin: flip the tier. In production a Stripe webhook should own this."""
+    with db.connect() as conn:
+        try:
+            tier = quota.set_tier(conn, req.tier)
+        except ValueError:
+            raise HTTPException(400, "tier must be free, professional, or enterprise")
+    return {"tier": tier}
+
+
+@app.post("/api/workspace/keys", status_code=201)
+def add_workspace_key(req: KeyIn) -> dict:
+    if req.provider not in ("apollo", "hunter"):
+        raise HTTPException(400, "provider must be 'apollo' or 'hunter'")
+    if len(req.api_key.strip()) < 8:
+        raise HTTPException(400, "that doesn't look like an API key")
+    return {
+        "provider": req.provider,
+        "preview": keys.set_key(tiers.DEFAULT_WORKSPACE, req.provider, req.api_key),
+        "scope": f"workspace {tiers.DEFAULT_WORKSPACE}",
+    }
+
+
+@app.delete("/api/workspace/keys/{provider}")
+def delete_workspace_key(provider: str) -> dict:
+    if not keys.delete_key(tiers.DEFAULT_WORKSPACE, provider):
+        raise HTTPException(404, "no key stored for that provider")
+    return {"deleted": provider}
 
 
 @app.post("/api/runs", status_code=201)
 def create_run(req: RunRequest, background: BackgroundTasks) -> dict:
+    with db.connect() as conn:
+        try:
+            quota.check(conn)
+        except quota.QuotaExceeded as exc:
+            raise HTTPException(
+                402,
+                detail={
+                    "error": "quota_exceeded",
+                    "message": f"Monthly hunt quota on tier '{exc.tier}' is spent. Upgrade in #pricing or raise the limit.",
+                    "upgrade_url": "/#pricing",
+                },
+            )
     run_id = db.new_id()
     overrides = {
         "target_titles": req.target_titles,
