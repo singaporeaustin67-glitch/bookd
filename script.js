@@ -12,23 +12,23 @@
   const CYCLES = [
     {
       lines: [
-        "載入產品 → 「工業級 CNC 切削液」",
-        "掃描 187 國資料庫… 12,483 位潛在買主命中",
-        "AI 撰寫個人化信件… 3 語版本通過品質門檻",
-        "寄送序列啟動 ▸ 2,000 封/日 · 自動跟催",
-        "Stefan K.(慕尼黑)接受了會議邀請 — 週四 15:00",
+        'Product loaded → "industrial CNC cutting fluid"',
+        "Scanning 187-country pool … 12,483 buyers matched",
+        "AI drafts personalized emails … 3 locales pass quality gate",
+        "Sequence live ▸ 2,000/day · auto follow-up",
+        "Sourcing Director (Munich) accepted — Thu 15:00 CET",
       ],
-      ok: "✔ 成約交付 — 會議已排入行事曆",
+      ok: "✔ Delivered — meeting on your calendar",
     },
     {
       lines: [
-        "載入產品 → 「運動襪 OEM 代工」",
-        "掃描全球採購訊號… 4,209 位潛在買主命中",
-        "AI 撰寫個人化信件… 5 語版本通過品質門檻",
-        "寄送序列啟動 ▸ 900 封/日 · 自動跟催",
-        "Emily C.(底特律)接受了會議邀請 — 週二 10:30",
+        'Product loaded → "athletic socks, OEM program"',
+        "Scanning global buying signals … 4,209 buyers matched",
+        "AI drafts personalized emails … 5 locales pass quality gate",
+        "Sequence live ▸ 900/day · auto follow-up",
+        "VP Procurement (Detroit) accepted — Tue 10:30 EST",
       ],
-      ok: "✔ 成約交付 — 會議已排入行事曆",
+      ok: "✔ Delivered — meeting on your calendar",
     },
   ];
 
@@ -58,19 +58,18 @@
   if (log) runTerminal();
 
   /* ── ticker feed ──────────────────────────────────────── */
-  const bookings = [
-    "✔ 斯圖加特 · 精密機械商 H. Bergmann — 10/28 09:00",
-    "✔ 大阪 · 化學品通路 田中物產 — 10/28 14:00",
-    "✔ 芝加哥 · 汽車售服集團 Apex — 10/29 10:30",
-    "✔ 聖保羅 · 建材進口商 NovaCorp — 10/29 16:00",
-    "✔ 新加坡 · 半導體設備商 Straits — 10/30 11:00",
-    "✔ 迪拜 · 能源採購商 Gulf Petro — 10/30 13:00",
-    "✔ 慕尼黑 · 工具機代理 Krüger Shop — 10/31 15:00",
-    "✔ 阿姆斯特丹 · 物流平台 Portflow — 11/01 09:30",
+  const lines = [
+    "✔ RESULT, NOT DATA",
+    "✔ YOU PAY FOR MEETED MEETINGS",
+    "✔ NO-SHOW = NO CHARGE",
+    "✔ 500M+ CONTACTS — ZERO LEAVE THE VAULT",
+    "✔ 40+ LANGUAGES IN THE WRITER",
+    "✔ QUALITY GATE BEFORE EVERY SEND",
+    "✔ MEETINGS. THAT'S THE DELIVERABLE.",
   ];
   const track = document.getElementById("tickerTrack");
   if (track) {
-    const items = bookings.map((b) => `<span>${b}</span>`).join("");
+    const items = lines.map((t) => `<span>${t}</span>`).join("");
     track.innerHTML = items + items; // duplicate for seamless loop
   }
 

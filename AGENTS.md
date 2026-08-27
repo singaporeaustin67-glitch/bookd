@@ -1,15 +1,18 @@
 # AGENTS.md
 
-## 專案:BOOKD 成約引擎 — 形象網站
-靜態行銷頁面:「Workflow AI over Data」全自動獲客服務。前檔賣「已約好會議」結果,資料庫串接在後台。語言:繁體中文。
+## Project: BOOKD — meeting-delivery engine landing page
+Static marketing site for a "Workflow AI over Data" acquisition service: database lives in the
+backend vault, frontend sells fully-booked meetings as the deliverable. Language: English.
 
-## 檔案
-- `index.html` — 單頁結構(Hero / 對比 / 五段管線 / 試跑 widget / 定價 / FAQ)
-- `styles.css` — 工業調度台美學:ink black、safety orange、cream paper、lime accent
-- `script.js` — 終端機流程模擬、ticker、滾動動畫、計數器、試跑 widget
+## Files
+- `index.html` — single page (Hero / contrast / 5-stage pipeline / live demo widget / pricing / FAQ)
+- `styles.css` — industrial dispatch aesthetic: ink black, safety orange, cream paper, lime accent
+- `script.js` — terminal pipeline sim, ticker, scroll reveals, count-up stats, demo widget
 
-## 本機預覽
+## Local preview
 `python3 -m http.server 12000`
 
-## 字型守則
-mono stack 用 `"JetBrains Mono", "Noto Sans TC", monospace` — 少了中文 fallback 會出現缺字方塊(tofu)。
+## Fonts
+Playfair Display (serif headlines) + Inter (body) + Archivo Black (logo) + JetBrains Mono (labels/terminal).
+Note: the mono stack previously needed a CJK fallback (`"Noto Sans TC"`) — removed when the site went
+English-only; re-add if Chinese copy returns or tofu boxes appear.

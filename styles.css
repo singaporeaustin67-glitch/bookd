@@ -15,10 +15,10 @@
   --line-ink: rgba(255, 255, 255, 0.09);
   --line-cream: rgba(16, 17, 19, 0.14);
 
-  --font-latin: "Archivo Black", "Noto Sans TC", sans-serif;
-  --font-serif: "Noto Serif TC", serif;
-  --font-sans:  "Noto Sans TC", sans-serif;
-  --font-mono:  "JetBrains Mono", "Noto Sans TC", monospace;
+  --font-latin: "Archivo Black", sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans:  "Inter", system-ui, sans-serif;
+  --font-mono:  "JetBrains Mono", monospace;
 
   --gutter: clamp(1.25rem, 4vw, 4rem);
   --section-pad: clamp(4.5rem, 10vw, 8.5rem);
