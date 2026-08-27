@@ -505,7 +505,25 @@ a { color: inherit; }
 }
 .pricing__rule b { font-weight: 700; }
 
-/* ── faq ── */
+/* ── contact ── */
+.contact { background: var(--cream); color: var(--ink); padding: 5.5rem var(--gutter); border-bottom: 1px solid var(--line); }
+.contact__sub { color: #555; margin-top: 1rem; max-width: 46rem; }
+.contact__form { max-width: 46rem; margin-top: 2.2rem; display: flex; flex-direction: column; gap: 0.9rem; }
+.contact__row { display: flex; gap: 0.9rem; flex-wrap: wrap; }
+.contact__row input { flex: 1 1 14rem; }
+.contact__form input, .contact__form textarea {
+  background: #fff;
+  border: 1px solid #d9d4c7;
+  padding: 0.85rem 1rem;
+  font: 1rem var(--font-sans);
+  color: var(--ink);
+  border-radius: 2px;
+}
+.contact__form input:focus, .contact__form textarea:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+.contact__form .btn { align-self: flex-start; }
+.contact__status { font-size: 0.75rem; min-height: 1rem; }
+.contact__status.ok { color: #4a6a10; }
+.contact__status.err { color: #b03a13; }
 .faq { background: var(--ink); padding: var(--section-pad) 0; }
 .faq__list { max-width: 800px; margin: 0 auto; padding: 0 var(--gutter); }
 .faq__item {

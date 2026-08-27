@@ -67,6 +67,13 @@ CREATE TABLE IF NOT EXISTS meetings (
     status TEXT NOT NULL DEFAULT 'proposed',
     created_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS contacts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT DEFAULT '',
+    email TEXT NOT NULL,
+    product TEXT DEFAULT '',
+    created_at TEXT NOT NULL
+);
 """
 
 

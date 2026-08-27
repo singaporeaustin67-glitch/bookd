@@ -245,10 +245,28 @@
             <li>Dedicated data engineers & private sources</li>
             <li>SLA with regional export controls</li>
           </ul>
-          <a href="#demo" class="btn btn--ghost">Talk to us</a>
+          <a href="#contact" class="btn btn--ghost">Talk to us</a>
         </article>
       </div>
       <p class="pricing__rule mono reveal">✔ No-show or off-ICP meeting — <b>full refund.</b> No argument.</p>
+    </section>
+
+    <!-- ══════════ CONTACT ══════════ -->
+    <section class="contact" id="contact">
+      <div class="section-head">
+        <p class="kicker mono">TALK TO US</p>
+        <h2 class="section-title">Tell us what you sell.</h2>
+        <p class="contact__sub">We'll come back with a scoped plan — usually within one business day.</p>
+      </div>
+      <form class="contact__form reveal" id="contactForm">
+        <div class="contact__row">
+          <input type="text" id="contactName" placeholder="Your name" autocomplete="name" />
+          <input type="email" id="contactEmail" placeholder="Work email" required autocomplete="email" />
+        </div>
+        <textarea id="contactProduct" placeholder="What do you sell, and who buys it? (one sentence is plenty)" rows="3"></textarea>
+        <button class="btn btn--solid" type="submit">Send it ▸</button>
+        <p class="contact__status mono" id="contactStatus"></p>
+      </form>
     </section>
 
     <!-- ══════════ FAQ ══════════ -->

@@ -13,7 +13,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import config, db, pipeline
-from .models import LeadIn, ReplyIn, RunRequest
+from .models import ContactIn, LeadIn, ReplyIn, RunRequest
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -140,6 +140,27 @@ def download_ics(meeting_id: str) -> FileResponse:
     if not path.exists():
         raise HTTPException(404, "ics file missing")
     return FileResponse(path, media_type="text/calendar", filename=row["ics_path"])
+
+
+@app.post("/api/contacts", status_code=201)
+def add_contact(contact: ContactIn) -> dict:
+    if "@" not in contact.email:
+        raise HTTPException(400, "valid email required")
+    with db.connect() as conn:
+        cur = conn.execute(
+            "INSERT INTO contacts (name, email, product, created_at) VALUES (?,?,?,?)",
+            (contact.name.strip(), contact.email.strip(), contact.product.strip(),
+             datetime.now(timezone.utc).isoformat(timespec="seconds")),
+        )
+        conn.commit()
+    return {"contact_id": cur.lastrowid, "status": "received"}
+
+
+@app.get("/api/contacts")
+def list_contacts() -> list[dict]:
+    with db.connect() as conn:
+        rows = conn.execute("SELECT * FROM contacts ORDER BY id DESC").fetchall()
+    return [dict(r) for r in rows]
 
 
 # Static site last — API routes take precedence

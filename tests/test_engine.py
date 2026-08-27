@@ -30,6 +30,16 @@ kenji@yamamoto-ind.example,Kenji,Sato,Purchasing Manager,Yamamoto Industries,yam
 """
 
 
+def test_contact_capture():
+    resp = client.post(
+        "/api/contacts",
+        json={"name": "Ada", "email": "ada@buyer.example", "product": "EV fleet BMS"},
+    )
+    assert resp.status_code == 201
+    listed = client.get("/api/contacts").json()
+    assert listed[0]["email"] == "ada@buyer.example"
+
+
 def test_icp_extraction():
     profile = icp.build_icp("Industrial CNC cutting fluid for aerospace machining")
     assert "cutting" in profile["keywords"] or "fluid" in profile["keywords"]

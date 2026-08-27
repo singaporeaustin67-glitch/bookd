@@ -13,7 +13,7 @@ what the engine's database returns.
   - `providers/` — local CSV-imported leads (always on) + Apollo/Hunter adapters (activate with keys)
   - `compose.py` — LLM writer (OpenAI/Anthropic) with template fallback; `sender.py` — SMTP/outbox
   - `classify.py` — reply intent; `booker.py` — time extraction + real .ics files
-- `tests/test_engine.py` — pytest end-to-end (import → run → reply → booked .ics). 10 tests, all real code paths.
+- `tests/test_engine.py` — pytest end-to-end (import → run → reply → booked .ics, contact capture). 11 tests, all real code paths.
 - `data/` — runtime SQLite + .ics files (gitignored); `.env` — secrets (gitignored, never commit)
 
 ## Run

@@ -99,6 +99,33 @@
     document.getElementById("demo").scrollIntoView({ behavior: "smooth" });
   });
 
+  /* ── contact form: real capture to the engine DB ───────── */
+  const contactForm = document.getElementById("contactForm");
+  const contactStatus = document.getElementById("contactStatus");
+  contactForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    contactStatus.className = "contact__status mono";
+    contactStatus.textContent = "Sending…";
+    try {
+      const resp = await fetch("/api/contacts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: document.getElementById("contactName").value.trim(),
+          email: document.getElementById("contactEmail").value.trim(),
+          product: document.getElementById("contactProduct").value.trim(),
+        }),
+      });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      contactStatus.classList.add("ok");
+      contactStatus.textContent = "✔ Received — we reply within one business day.";
+      contactForm.reset();
+    } catch (err) {
+      contactStatus.classList.add("err");
+      contactStatus.textContent = `✕ Send failed — ${err.message}`;
+    }
+  });
+
   /* ── demo widget: real runs against the engine ──────────── */
   const demoForm = document.getElementById("demoForm");
   const stepsBox = document.getElementById("demoSteps");

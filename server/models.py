@@ -28,3 +28,9 @@ class ReplyIn(BaseModel):
     email_id: int | None = None
     from_email: str = ""
     body: str = Field(min_length=1)
+
+
+class ContactIn(BaseModel):
+    name: str = ""
+    email: str
+    product: str = ""
