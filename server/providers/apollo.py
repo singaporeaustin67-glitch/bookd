@@ -1,4 +1,4 @@
-"""Apollo.io provider — activates when APOLLO_API_KEY is set.
+"""Apollo.io provider — activates with a workspace BYOK key or the env APOLLO_API_KEY.
 
 Uses Apollo's people search API. Docs: https://docs.apollo.io/
 """
@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import httpx
 
-from .. import config
+from .. import keys
 from .base import normalize
 
 SEARCH_URL = "https://api.apollo.io/v1/mixed_people/search"
@@ -17,9 +17,12 @@ class ApolloProvider:
     name = "apollo"
 
     def available(self) -> bool:
-        return bool(config.APOLLO_API_KEY)
+        return keys.resolve("apollo")[0] is not None
 
     def search(self, icp: dict, limit: int) -> list[dict]:
+        api_key, _ = keys.resolve("apollo")
+        if not api_key:
+            return []
         payload: dict = {
             "page": 1,
             "per_page": min(limit, 100),
@@ -32,7 +35,7 @@ class ApolloProvider:
         resp = httpx.post(
             SEARCH_URL,
             json=payload,
-            headers={"X-Api-Key": config.APOLLO_API_KEY, "Content-Type": "application/json"},
+            headers={"X-Api-Key": api_key, "Content-Type": "application/json"},
             timeout=30,
         )
         resp.raise_for_status()

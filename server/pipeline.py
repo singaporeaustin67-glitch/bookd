@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from . import booker, classify, compose, config, db, icp as icp_mod, sender
+from . import booker, classify, compose, config, db, icp as icp_mod, quota, sender
 from .providers import source_leads
 
 
@@ -17,8 +17,20 @@ def execute_run(run_id: str, product: str, overrides: dict, send: bool) -> None:
         profile = icp_mod.build_icp(product, overrides)
         db.log_event(conn, run_id, "input", f"ICP locked: titles={len(profile['titles'])}, keywords={', '.join(profile['keywords'][:5])}")
 
-        # 02 — source
-        leads, notes = source_leads(profile, config.MAX_LEADS_PER_RUN)
+        # 02 — source, bounded by this month's hunt quota
+        try:
+            limit, capped = quota.cap_request(conn, config.MAX_LEADS_PER_RUN)
+        except quota.QuotaExceeded as exc:
+            db.log_event(conn, run_id, "search", f"Monthly hunt quota reached on tier '{exc.tier}' — run declined. Upgrade to continue.")
+            db.set_run_status(conn, run_id, "quota_exceeded", finished=True)
+            return
+        if capped and limit == 0:
+            db.log_event(conn, run_id, "search", "Monthly hunt quota nearly spent — cannot source more leads.")
+            db.set_run_status(conn, run_id, "quota_exceeded", finished=True)
+            return
+        if capped:
+            db.log_event(conn, run_id, "search", f"Request capped at {limit} leads by monthly quota")
+        leads, notes = source_leads(profile, limit)
         for note in notes:
             db.log_event(conn, run_id, "search", note)
         if not leads:
@@ -26,6 +38,7 @@ def execute_run(run_id: str, product: str, overrides: dict, send: bool) -> None:
             db.set_run_status(conn, run_id, "no_leads", finished=True)
             return
         db.log_event(conn, run_id, "search", f"{len(leads)} buyers matched")
+        quota.consume(conn, len(leads))
 
         # 03+04 — compose & send/queue
         sent = 0

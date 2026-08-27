@@ -74,6 +74,25 @@ CREATE TABLE IF NOT EXISTS contacts (
     product TEXT DEFAULT '',
     created_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS workspace (
+    id TEXT PRIMARY KEY,
+    tier TEXT NOT NULL DEFAULT 'free',
+    created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS api_keys (
+    workspace TEXT NOT NULL,
+    provider TEXT NOT NULL,
+    token_encrypted TEXT NOT NULL,
+    preview TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (workspace, provider)
+);
+CREATE TABLE IF NOT EXISTS usage_counters (
+    workspace TEXT NOT NULL,
+    month TEXT NOT NULL,
+    hunts INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (workspace, month)
+);
 """
 
 

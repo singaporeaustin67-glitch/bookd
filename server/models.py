@@ -34,3 +34,12 @@ class ContactIn(BaseModel):
     name: str = ""
     email: str
     product: str = ""
+
+
+class KeyIn(BaseModel):
+    provider: str = Field(min_length=2, max_length=20)
+    api_key: str = Field(min_length=8, max_length=200)
+
+
+class TierUpdate(BaseModel):
+    tier: str = Field(min_length=3, max_length=20)
