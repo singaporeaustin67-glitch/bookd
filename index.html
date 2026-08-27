@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BOOKD 成約引擎 — 你買的不是名單,是已經約好的會議</title>
+  <meta name="description" content="輸入你的產品,BOOKD 自動在全球資料庫獵客、AI 寫信、自動寄送,只交付「已經約好會議」的客戶。按成約計費,無效會議不收費。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Noto+Serif+TC:wght@600;900&family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ══════════ NAV ══════════ -->
+  <header class="nav" id="nav">
+    <a class="nav__logo" href="#top" aria-label="BOOKD 首頁">
+      <span class="nav__logo-box">BOOKD</span><span class="nav__logo-sub">成約引擎</span>
+    </a>
+    <nav class="nav__links" aria-label="主選單">
+      <a href="#contrast">為什麼</a>
+      <a href="#how">運作方式</a>
+      <a href="#demo">線上試跑</a>
+      <a href="#pricing">定價</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a class="btn btn--solid nav__cta" href="#demo">啟動試跑 ▸</a>
+  </header>
+
+  <main id="top">
+
+    <!-- ══════════ STATUS STRIP ══════════ -->
+    <div class="statusbar" role="status">
+      <span class="statusbar-dot" aria-hidden="true"></span>
+      <span class="statusbar-text mono">SYSTEM LIVE — 今日已交付 2,417 場會議 · 187 國資料庫掃描中 *</span>
+    </div>
+
+    <!-- ══════════ HERO ══════════ -->
+    <section class="hero">
+      <div class="hero__bg" aria-hidden="true">
+        <svg class="hero__wires" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+          <path class="wire" d="M80,640 C 300,520 420,300 700,240" />
+          <path class="wire" d="M40,420 C 260,380 520,180 940,120" />
+          <path class="wire" d="M120,700 C 420,640 700,420 1120,360" />
+          <path class="wire" d="M200,180 C 480,260 760,520 1160,620" />
+        </svg>
+        <span class="node" style="--x:8%;  --y:78%;" data-name="MÜNCHEN"></span>
+        <span class="node" style="--x:62%; --y:24%;" data-name="OSAKA"></span>
+        <span class="node" style="--x:88%; --y:44%;" data-name="CHICAGO"></span>
+        <span class="node" style="--x:28%; --y:52%;" data-name="SÃO PAULO"></span>
+        <span class="node" style="--x:94%; --y:74%;" data-name="SINGAPORE"></span>
+      </div>
+
+      <div class="hero__inner">
+        <p class="hero__kicker mono reveal">RESULT, NOT DATA — 結果導向的獲客自動化</p>
+        <h1 class="hero__title">
+          <span class="reveal">你買的不是名單,</span>
+          <span class="reveal reveal--d1">是<mark>已經約好的會議</mark>。</span>
+        </h1>
+        <p class="hero__sub reveal reveal--d2">
+          輸入你的產品 — BOOKD 自動在全球資料庫獵客、AI 逐封撰寫個人化信件、自動寄送與跟催,
+          最後只把<b>約好開會時間的買主</b>交到你手上。資料在後台,成果在前台。
+        </p>
+
+        <form class="hero__form reveal reveal--d3" id="heroForm" aria-label="快速試跑">
+          <input type="text" id="heroInput" placeholder="貼上你的產品,例如:車用鋰電池 BMS 模組" autocomplete="off" />
+          <button class="btn btn--solid" type="submit">立刻試跑 ▸</button>
+        </form>
+        <p class="hero__fineprint mono reveal reveal--d4">※ 即時示範 · 資料皆為模擬內容</p>
+
+        <!-- 動態終端機 -->
+        <div class="terminal reveal reveal--d5" role="img" aria-label="BOOKD 自動化流程模擬畫面">
+          <div class="terminal__bar">
+            <span class="terminal__dot"></span><span class="terminal__dot"></span><span class="terminal__dot"></span>
+            <span class="terminal__title mono">bookd — pipeline://live</span>
+          </div>
+          <ol class="terminal__log mono" id="terminalLog"></ol>
+          <div class="terminal__result mono" id="terminalResult" hidden>
+            ✔ 成約交付 — 會議已排入行事曆
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ TICKER ══════════ -->
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker__track" id="tickerTrack"></div>
+    </div>
+
+    <!-- ══════════ CONTRAST ══════════ -->
+    <section class="contrast" id="contrast">
+      <div class="section-head">
+        <p class="kicker mono">別再買資料了</p>
+        <h2 class="section-title">名單販售已死。<span class="accent">成約才是商品。</span></h2>
+      </div>
+      <div class="contrast__grid">
+        <article class="contrast__card contrast__card--old reveal">
+          <h3 class="mono">舊模式:買資料</h3>
+          <ol>
+            <li>買下 10 萬筆名單</li>
+            <li>自己寫信、自己寄</li>
+            <li>自己追、自己約</li>
+            <li>三個月後……也許有會議</li>
+          </ol>
+          <p class="contrast__verdict mono">✕ 資料 ≠ 成果</p>
+        </article>
+        <article class="contrast__card contrast__card--new reveal">
+          <h3 class="mono">BOOKD:買成果</h3>
+          <ol>
+            <li>輸入產品 → 全球資料庫即時獵客</li>
+            <li>AI 寫信 → 自動寄送、自動跟催</li>
+            <li>只交付「已約好會議」的買主</li>
+            <li>按成約計費,名單永不離開後台</li>
+          </ol>
+          <p class="contrast__verdict mono">✔ 你付錢,買的是結果</p>
+        </article>
+      </div>
+      <p class="contrast__note mono reveal">資料庫是引擎的燃料,不是販售的商品 — Workflows over Data</p>
+    </section>
+
+    <!-- ══════════ HOW / PIPELINE ══════════ -->
+    <section class="how" id="how">
+      <div class="section-head section-head--dark">
+        <p class="kicker mono">THE MACHINE — 五段式自動管線</p>
+        <h2 class="section-title">從「產品」到「會議」,全程無人值守。</h2>
+      </div>
+      <ol class="pipeline">
+        <li class="stage reveal">
+          <span class="stage__idx mono">01</span>
+          <div class="stage__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 3v10m0 0 4-4m-4 4-4-4M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+          </div>
+          <h3>輸入你的產品</h3>
+          <p>貼上產品簡介或網址,AI 自動提煉賣點、鎖定買主畫像 (ICP)。</p>
+          <span class="stage__tag mono">INPUT</span>
+        </li>
+        <li class="stage reveal">
+          <span class="stage__idx mono">02</span>
+          <div class="stage__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2m0 14v2M3 12h2m14 0h2"/></svg>
+          </div>
+          <h3>全球資料庫獵客</h3>
+          <p>在後台串接 5 億+ 筆企業名單,依產業、職稱、地區、採購訊號即時掃描 187 國。</p>
+          <span class="stage__tag mono">SEARCH</span>
+        </li>
+        <li class="stage reveal">
+          <span class="stage__idx mono">03</span>
+          <div class="stage__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 1 1 4 4L8 20l-5 1 1-5Z"/></svg>
+          </div>
+          <h3>AI 逐封寫信</h3>
+          <p>依每位買主的背景產生個人化信件,40+ 種語言、在地化語氣,送信前經品質分數把關。</p>
+          <span class="stage__tag mono">WRITE</span>
+        </li>
+        <li class="stage reveal">
+          <span class="stage__idx mono">04</span>
+          <div class="stage__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4Z"/></svg>
+          </div>
+          <h3>自動寄送與跟催</h3>
+          <p>多波次序列、智慧跟催、退信與疲勞控管;你完全不碰寄件匣。</p>
+          <span class="stage__tag mono">SEND</span>
+        </li>
+        <li class="stage stage--final reveal">
+          <span class="stage__idx mono">05</span>
+          <div class="stage__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M8 2v3m8-3v3M3 9h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/><path d="m9 15 2 2 4-4"/></svg>
+          </div>
+          <h3>只交付「成約」</h3>
+          <p>已約好的會議直接進你的行事曆。其餘名單,永不離開資料庫。</p>
+          <span class="stage__tag mono">BOOKED</span>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ══════════ LIVE DEMO ══════════ -->
+    <section class="demo" id="demo">
+      <div class="section-head">
+        <p class="kicker mono">線上試跑 — 40 秒看見結果</p>
+        <h2 class="section-title">現在就丟一個產品進來。</h2>
+      </div>
+      <div class="demo__panel reveal">
+        <form class="demo__form" id="demoForm">
+          <input type="text" id="demoInput" placeholder="例如:CNC 切削液、鋰電池 BMS、運動襪代工 …" autocomplete="off" />
+          <button class="btn btn--solid" type="submit">開始自動獵客 ▸</button>
+        </form>
+        <ol class="demo__steps mono" id="demoSteps">
+          <li data-step="scan"><i>02</i> 掃描全球資料庫…</li>
+          <li data-step="match"><i>03</i> AI 撰寫個人化信件…</li>
+          <li data-step="send"><i>04</i> 寄送序列啟動…</li>
+          <li data-step="book"><i>05</i> 買主回覆,會議排定…</li>
+        </ol>
+        <div class="demo__results" id="demoResults" hidden>
+          <p class="demo__count mono">✔ 已排定 <b>3</b> 場會議 *</p>
+          <div class="demo__cards">
+            <article class="meet-card">
+              <h4>Stefan Krüger</h4><p class="mono">Sourcing Director</p>
+              <p class="meet-card__org">Präzision Parts GmbH · 慕尼黑</p>
+              <p class="meet-card__time mono">週四 15:00 CET</p>
+            </article>
+            <article class="meet-card">
+              <h4>Emily Chen</h4><p class="mono">VP, Procurement</p>
+              <p class="meet-card__org">Apex Mobility · 底特律</p>
+              <p class="meet-card__time mono">週二 10:30 EST</p>
+            </article>
+            <article class="meet-card">
+              <h4>上田雅也</h4><p class="mono">採購課長</p>
+              <p class="meet-card__org">Yamamoto Industries · 名古屋</p>
+              <p class="meet-card__time mono">週五 09:00 JST</p>
+            </article>
+          </div>
+          <p class="mono demo__disclaimer">* 示範資料為模擬內容</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ STATS ══════════ -->
+    <section class="stats">
+      <div class="stats__grid">
+        <div class="stat reveal"><b class="mono" data-count="5" data-suffix="億+">0</b><span>後台企業名單</span></div>
+        <div class="stat reveal"><b class="mono" data-count="187" data-suffix=" 國">0</b><span>資料庫覆蓋</span></div>
+        <div class="stat reveal"><b class="mono" data-count="42" data-suffix=" 種">0</b><span>信件語言</span></div>
+        <div class="stat reveal"><b class="mono" data-count="38" data-suffix=" 天">0</b><span>平均首場會議</span></div>
+      </div>
+    </section>
+
+    <!-- ══════════ PRICING ══════════ -->
+    <section class="pricing" id="pricing">
+      <div class="section-head">
+        <p class="kicker mono">按成約計費 — 未出席不收錢</p>
+        <h2 class="section-title">你不為「資料」付費,<span class="accent">只為「會議」付費。</span></h2>
+      </div>
+      <div class="pricing__grid">
+        <article class="plan reveal">
+          <h3 class="mono">PILOT 試航</h3>
+          <p class="plan__for">驗證單一產品線</p>
+          <p class="plan__price"><b>$2,900</b><span>/ 每場成約</span></p>
+          <ul>
+            <li>1 條產品線 · 每月至多 10 場</li>
+            <li>全球資料庫獵客 + AI 寫信</li>
+            <li>會議直接排入你的行事曆</li>
+          </ul>
+          <a href="#demo" class="btn btn--ghost">從試跑開始</a>
+        </article>
+        <article class="plan plan--hot reveal">
+          <span class="plan__badge mono">最受歡迎</span>
+          <h3 class="mono">ENGINE 引擎</h3>
+          <p class="plan__for">放量經營多條線</p>
+          <p class="plan__price"><b>$1,450</b><span>/ 每場成約 · 50 場起</span></p>
+          <ul>
+            <li>至多 5 條產品線並行</li>
+            <li>CRM (HubSpot / Salesforce) 串接</li>
+            <li>品質規則自定義:你定義什麼算「有效會議」</li>
+          </ul>
+          <a href="#demo" class="btn btn--solid">啟動引擎 ▸</a>
+        </article>
+        <article class="plan reveal">
+          <h3 class="mono">GLOBAL 全球</h3>
+          <p class="plan__for">多區域法規與規模</p>
+          <p class="plan__price"><b>客製</b><span>專案報價</span></p>
+          <ul>
+            <li>GDPR / CCPA 合規法務支援</li>
+            <li>專屬資料工程師與私有來源</li>
+            <li>SLA 與專屬出口管控</li>
+          </ul>
+          <a href="#demo" class="btn btn--ghost">聯絡我們</a>
+        </article>
+      </div>
+      <p class="pricing__rule mono reveal">✔ 會議未出席或不符合 ICP — <b>全額退費</b>,不囉嗦。</p>
+    </section>
+
+    <!-- ══════════ FAQ ══════════ -->
+    <section class="faq" id="faq">
+      <div class="section-head section-head--dark">
+        <p class="kicker mono">常見問題</p>
+        <h2 class="section-title">先把話說清楚。</h2>
+      </div>
+      <div class="faq__list">
+        <details class="faq__item reveal" open>
+          <summary class="mono">資料從哪裡來?</summary>
+          <p>公開商業資訊、企業登記、進出口與採購訊號等合法來源;全程依 GDPR / CCPA 處理。名單只存在於後台,永不外售。</p>
+        </details>
+        <details class="faq__item">
+          <summary class="mono">AI 寫的信,會不會很像垃圾信?</summary>
+          <p>每封信都依該位買主的背景生成,送信前經「品質分數」把關,低於門檻不寄。我們賣的是會議,不是垃圾郵件量。</p>
+        </details>
+        <details class="faq__item">
+          <summary class="mono">「有效會議」由誰定義?</summary>
+          <p>你。啟動時設定 ICP 規則(產業、職級、地區、預算訊號)。不符合規則的會議,不算計費項目。</p>
+        </details>
+        <details class="faq__item">
+          <summary class="mono">需要接什麼工具?</summary>
+          <p>Google / Outlook 行事曆,與 HubSpot / Salesforce。接好後,會議與狀態自動同步進你的管道。</p>
+        </details>
+        <details class="faq__item">
+          <summary class="mono">可以只跑特定國家或產業嗎?</summary>
+          <p>可以。地區、語言、產業、企業規模皆可篩;不想觸及的市場也可列入排除清單。</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- ══════════ FINAL CTA ══════════ -->
+    <section class="final-cta">
+      <h2 class="final-cta__title reveal">把獲客,<br /><mark>外包給機器。</mark></h2>
+      <a class="btn btn--solid btn--xl reveal" href="#demo">免費試跑 BOOKD ▸</a>
+    </section>
+
+  </main>
+
+  <!-- ══════════ FOOTER ══════════ -->
+  <footer class="footer">
+    <div class="footer__grid">
+      <div>
+        <p class="nav__logo-box footer__logo">BOOKD</p>
+        <p class="footer__tag mono">RESULT, NOT DATA.</p>
+      </div>
+      <div class="footer__col">
+        <h4 class="mono">產品</h4>
+        <a href="#how">五段式管線</a>
+        <a href="#pricing">按成約計費</a>
+        <a href="#demo">線上試跑</a>
+      </div>
+      <div class="footer__col">
+        <h4 class="mono">合規</h4>
+        <a href="#faq">資料來源</a>
+        <a href="#faq">GDPR / CCPA</a>
+        <a href="#faq">有效會議規則</a>
+      </div>
+      <div class="footer__col">
+        <h4 class="mono">公司</h4>
+        <a href="#top">關於 BOOKD</a>
+        <a href="#faq">聯絡我們</a>
+      </div>
+    </div>
+    <p class="footer__legal mono">© 2026 BOOKD 成約引擎 — 本頁為概念展示,所有數據、人名、公司名稱與會議皆為虛構模擬。</p>
+  </footer>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
