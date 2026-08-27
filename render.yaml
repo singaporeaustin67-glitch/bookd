@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: bookd
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server.app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/config
+    envVars:
+      - key: BOOKD_DATA_DIR
+        value: /var/data
+      - key: BOOKD_SITE_ROOT
+        value: .
+    disk:
+      mountPath: /var/data
+      sizeGB: 1
